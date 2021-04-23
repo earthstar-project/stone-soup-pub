@@ -9,24 +9,27 @@ import { sseMiddleware } from 'express-sse-middleware';
 
 import {
     AuthorKeypair,
-    Document,
-    IStorage,
-    StorageMemory,
-    StorageSqlite,
-    ValidatorEs4,
+    Crypto,
+    CryptoDriverTweetnacl,
+    Doc,
+    FormatValidatorEs4,
+    IStorageAsync,
+    IngestResult,
+    StorageAsync,
+    StorageDriverAsyncMemory,
     WorkspaceAddress,
-    WriteResult,
     isErr,
-} from 'earthstar';
+} from 'stone-soup';
 
 //================================================================================
 // EARTHSTAR SETUP
 
-let VALIDATORS = [ValidatorEs4];
 let FORMAT = 'es.4';
+let CRYPTO = new Crypto(CryptoDriverTweetnacl);
+let VALIDATOR = new FormatValidatorEs4(CRYPTO);
 
 let DEMO_WORKSPACE = '+gardening.pals';
-let setUpDemoStorage = (storage : IStorage) => {
+let setUpDemoStorage = (storage : IStorageAsync) => {
     let keypair : AuthorKeypair = {
         address: "@bird.btr46n7ij6eq6hwnpvfcdakxqy3e6vz4e5vmw33ur7tjey5dkx6ea",
         secret: "bcrmyrih74d5mpvaco3tjrawgzebnmzyqdxvxnvg2hvnsfdj3izga"
@@ -34,6 +37,7 @@ let setUpDemoStorage = (storage : IStorage) => {
     let aboutPath = `/about/~${keypair.address}/displayName.txt`;
     storage.set(keypair, {
         format: FORMAT,
+        workspace: DEMO_WORKSPACE,
         path: aboutPath,
         content: 'Bird, the example author',
     });
@@ -44,7 +48,7 @@ let setUpDemoStorage = (storage : IStorage) => {
 
 // from https://stackoverflow.com/questions/40263803/native-javascript-or-es6-way-to-encode-and-decode-html-entities
 // escape HTML-related characters
-let safe = (str : string) =>
+let safe = (str: string) =>
     str.replace(/[&<>'"]/g, (tag) => (({
         '&': '&amp;',
         '<': '&lt;',
@@ -53,11 +57,11 @@ let safe = (str : string) =>
         '"': '&quot;'
     } as any)[tag]));
 
-let wrapInHtmlHeaderAndFooter = (page : string) : string => 
+let wrapInHtmlHeaderAndFooter = (page: string): string => 
     `<!DOCTYPE html>
     <html>
     <head>
-        <title>🌎⭐️🗃 Earthstar Pub</title>
+        <title>🌎⭐️🗃 Earthstar Pub (Stone Soup edition)</title>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no">
         <style>
@@ -209,18 +213,19 @@ let listOfWorkspaces = (workspaces: string[], discoverableWorkspaces: boolean, t
             ${aboutBadge(title, notes)}
         </div>
         <h1>🗃 Earthstar Pub</h1>
+        <h3>Stone Soup edition</h3>
         ${workspaceSection}
         <hr/>
-        ${apiDocs('+exampleworkspace.12345')}
+        ${apiDocs('+your.workspace')}
         <hr/>
-        ${cliDocs('+exampleworkspace.12345')}
+        ${cliDocs('+your.workspace')}
         <hr/>
         <p><small><a href="https://github.com/earthstar-project/earthstar">Earthstar on Github</a></small></p>
         `
     );
 }
 
-let workspaceDetails = (storage : IStorage) : string =>
+let workspaceDetails = async (storage: IStorageAsync): Promise<string> =>
     wrapInHtmlHeaderAndFooter(
         `<p><a href="/">&larr; Home</a></p>
         <h2>📂 Workspace: <code class="cWorkspace">${safe(storage.workspace)}</code></h2>
@@ -230,20 +235,20 @@ let workspaceDetails = (storage : IStorage) : string =>
             </form>
         </p>
         <hr />
-        ${pathsAndContents(storage)}
+        ${await pathsAndContents(storage)}
         `
     );
 
-let cliDocs = (workspaceAddress : WorkspaceAddress) : string =>
+let cliDocs = (workspaceAddress: WorkspaceAddress): string =>
     `<h2>Sync with command line</h2>
     <p>You can sync with this pub using <a href="https://github.com/cinnamon-bun/earthstar-cli">earthstar-cli</a>.</p>
     <p>First create a local database with the same workspace name:</p>
-    <p><code>$ earthstar create-workspace localfile.sqlite +exampleworkspace.12345</code></p>
+    <p><code>$ earthstar create-workspace localfile.sqlite +your.workspace</code></p>
     Then you can sync:
     <p><code>$ earthstar sync localfile.sqlite http://pub-url.com</code></p>
     `
 
-let apiDocs = (workspace : string) =>
+let apiDocs = (workspace: string) =>
     `<h2>HTTP API</h2>
     <p>Replace <code>:workspace</code> with your actual workspace address, including its leading plus character.
     <ul>
@@ -252,23 +257,27 @@ let apiDocs = (workspace : string) =>
         <li>POST <code>/earthstar-api/v1/:workspace/documents</code> - upload documents (supply as a JSON array)</li>
     </ul>`;
 
-let pathsAndContents = (storage : IStorage) : string =>
-    `<h2>Paths and contents</h2>` + 
-    storage.documents().map(doc =>
-        `<div>📄 <code class="cPath">${safe(doc.path)}</code></div>
-        <div><pre class="cContent indent">${safe(doc.content)}</pre></div>
-        <details class="indent">
-            <summary>...</summary>
-            ${
-                storage.documents({ path: doc.path, history: 'all', }).map((historyDoc, ii) => {
+let pathsAndContents = async (storage: IStorageAsync): Promise<string> => {
+    let docs = await storage.getAllDocs();
+    let docSections: string[] = [];
+    for (let doc of docs) {
+        let historyDocs = await storage.getAllDocsAtPath(doc.path);
+        docSections.push(
+            `<div>📄 <code class="cPath">${safe(doc.path)}</code></div>
+            <div><pre class="cContent indent">${safe(doc.content)}</pre></div>
+            <details class="indent">
+                <summary>...</summary>
+                ${historyDocs.map((historyDoc, ii) => {
                     let outlineClass = ii === 0 ? 'outlined' : ''
                     return `<pre class="small ${outlineClass}">${JSON.stringify(historyDoc, null, 2)}</pre>`
-                }).join('\n')
-            }
-        </details>
-        <div>&nbsp;</div>
-        `
-    ).join('\n');
+                }).join('\n')}
+            </details>
+            <div>&nbsp;</div>
+            `
+        );
+    }
+    return `<h2>Paths and contents</h2>\n` + docSections.join('\n');
+}
 
 //================================================================================
 // EXPRESS SERVER
@@ -296,7 +305,7 @@ let filenameToWorkspace = (filename: string) => {
     return '+' + path.basename(filename);
 }
 
-export let makeExpressApp = (opts : PubOpts) => {
+export let makeExpressApp = (opts: PubOpts) => {
     // returns an Express app but does not start running it.
 
     let logBasic = (...args: any[]) => {
@@ -310,10 +319,13 @@ export let makeExpressApp = (opts : PubOpts) => {
     }
 
     // a structure to hold our Earthstar workspaces
-    let workspaceToStorage : {[ws : string] : IStorage} = {};
+    let workspaceToStorage: {[ws: string]: IStorageAsync} = {};
 
     // load existing files
     if (opts.storageType === 'sqlite' && opts.dataFolder !== undefined) {
+        console.error('sqlite is not supported yet'); // TODO
+        process.exit(1);
+        /*
         logVerbose('loading existing sqlite files');
         let files = fs.readdirSync(opts.dataFolder).filter(f => f.endsWith('.sqlite'));
         for (let fn of files) {
@@ -328,9 +340,10 @@ export let makeExpressApp = (opts : PubOpts) => {
             workspaceToStorage[workspace] = storage;
             logVerbose('    loaded');
         }
+        */
     }
 
-    let obtainStorage = (workspace : string, createOnDemand : boolean, opts : PubOpts) : IStorage | undefined => {
+    let obtainStorage = (workspace: string, createOnDemand: boolean, opts: PubOpts): IStorageAsync | undefined => {
         logSensitive('obtainStorage', workspace);
         let storage = workspaceToStorage[workspace];
         if (storage !== undefined) { return storage; }
@@ -338,8 +351,15 @@ export let makeExpressApp = (opts : PubOpts) => {
 
         // create workspace on demand
         if (opts.storageType === 'memory') {
-            storage = new StorageMemory(VALIDATORS, workspace);
+            storage = new StorageAsync(
+                workspace,
+                VALIDATOR,
+                new StorageDriverAsyncMemory(workspace)
+            );
         } else if (opts.storageType === 'sqlite') {
+            console.error('sqlite not supported yet');
+            process.exit(1)
+            /*
             try {
                 // make sure workspace address is valid so we know it will be a safe filename
                 let err = VALIDATORS[0]._checkWorkspaceIsValid(workspace);
@@ -362,6 +382,7 @@ export let makeExpressApp = (opts : PubOpts) => {
                 console.error(err);
                 return undefined;
             }
+            */
         }
         workspaceToStorage[workspace] = storage;
         return storage;
@@ -397,47 +418,54 @@ export let makeExpressApp = (opts : PubOpts) => {
         res.send(listOfWorkspaces(workspaces, opts.discoverableWorkspaces, opts.title, opts.notes));
     });
 
-    app.get('/workspace/:workspace', (req, res) => {
+    app.get('/workspace/:workspace', async (req, res) => {
         logVerbose('workspace view');
         let workspace = req.params.workspace;
         let storage = obtainStorage(workspace, false, opts);
         if (storage === undefined) { res.sendStatus(404); return; };
-        res.send(workspaceDetails(storage));
+        res.send(await workspaceDetails(storage));
     });
 
     //--------------------------------------------------
     // API
 
     // list paths
-    app.get('/earthstar-api/v1/:workspace/paths', (req, res) => {
+    app.get('/earthstar-api/v1/:workspace/paths', async (req, res) => {
         logVerbose('giving paths');
         let workspace = req.params.workspace;
         let storage = obtainStorage(workspace, false, opts);
         if (storage === undefined) { res.sendStatus(404); return; };
-        res.json(storage.paths());
+        // TODO: once we have storage.paths implemented, use that
+        let paths = (await storage.getLatestDocs()).map(doc => doc.path);
+        paths = [...new Set<string>(paths)];
+        paths.sort();
+        res.json(paths);
     });
 
     // get all documents
-    app.get('/earthstar-api/v1/:workspace/documents', (req, res) => {
+    app.get('/earthstar-api/v1/:workspace/documents', async (req, res) => {
         logVerbose('giving documents');
         let workspace = req.params.workspace;
         let storage = obtainStorage(workspace, false, opts);
         if (storage === undefined) { res.sendStatus(404); return; };
-        res.json(storage.documents({ history: 'all' }));
+        res.json(await storage.getAllDocs())
     });
 
     // ingest documents (uploaded from client)
-    app.post('/earthstar-api/v1/:workspace/documents', express.json({type: '*/*'}), (req, res) => {
+    app.post('/earthstar-api/v1/:workspace/documents', express.json({type: '*/*'}), async (req, res) => {
         logVerbose('ingesting documents');
         if (opts.readonly) { res.sendStatus(403); return; }
         let workspace = req.params.workspace;
         let storage = obtainStorage(workspace, opts.allowPushToNewWorkspaces, opts);
         if (storage === undefined) { res.sendStatus(404); return; };
-        let docs : Document[] = req.body;
+        let docs : Doc[] = req.body;
         if (!Array.isArray(docs)) { res.sendStatus(400); return; }
         let numIngested = 0;
         for (let doc of docs) {
-            if (storage.ingestDocument(doc, 'TODO: sessionid') === WriteResult.Accepted) { numIngested += 1; }
+            let result = await storage.ingest(doc);
+            if (result === IngestResult.AcceptedAndLatest || result === IngestResult.AcceptedButNotLatest) {
+                numIngested += 1;
+            }
         }
         res.json({
             numIngested: numIngested,
@@ -451,7 +479,7 @@ export let makeExpressApp = (opts : PubOpts) => {
     app.post('/earthstar-api/v1/:workspace/delete', (req, res) => {
         logVerbose('deleting workspace');
         let workspace = req.params.workspace;
-        workspaceToStorage[workspace].close();
+        //workspaceToStorage[workspace].close();  // TODO: there's no close() yet
         delete workspaceToStorage[workspace];
         res.redirect('/');
     });
@@ -468,6 +496,7 @@ export let makeExpressApp = (opts : PubOpts) => {
     });
 
     // live stream from server to client
+    /* TODO: rebuild this using followers
     app.get('/earthstar-api/v1/:workspace/stream', (req, res) => {
         // Create a stream of server-sent events for the new write events in a workspace.
         // Return a stream of all newly occurring documents (encoded as JSON).
@@ -525,6 +554,7 @@ export let makeExpressApp = (opts : PubOpts) => {
             unsub();
         });
     });
+    */
 
     return app;
 }

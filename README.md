@@ -1,4 +1,8 @@
-# Earthstar Pub
+# Earthstar Pub -- Stone Soup edition
+
+This version is built on [Stone Soup](https://github.com/earthstar-project/stone-soup) which is a second-gen implementation of Earthstar.
+
+---
 
 Hosts and syncs [Earthstar](https://github.com/cinnamon-bun/earthstar) workspaces over HTTP.  One pub server can hold multiple Earthstar workspaces.
 
