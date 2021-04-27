@@ -1,6 +1,6 @@
 {
   "name": "stone-soup-pub",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Host Earthstar workspaces via HTTP",
   "engines": {
     "node": "12.x"
