@@ -462,8 +462,8 @@ export let makeExpressApp = (opts: PubOpts) => {
         if (!Array.isArray(docs)) { res.sendStatus(400); return; }
         let numIngested = 0;
         for (let doc of docs) {
-            let result = await storage.ingest(doc);
-            if (result === IngestResult.AcceptedAndLatest || result === IngestResult.AcceptedButNotLatest) {
+            let { ingestResult, docIngested } = await storage.ingest(doc);
+            if (ingestResult === IngestResult.AcceptedAndLatest || ingestResult === IngestResult.AcceptedButNotLatest) {
                 numIngested += 1;
             }
         }
