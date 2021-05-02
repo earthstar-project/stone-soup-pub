@@ -37,7 +37,6 @@ let setUpDemoStorage = (storage : IStorageAsync) => {
     let aboutPath = `/about/~${keypair.address}/displayName.txt`;
     storage.set(keypair, {
         format: FORMAT,
-        workspace: DEMO_WORKSPACE,
         path: aboutPath,
         content: 'Bird, the example author',
     });
