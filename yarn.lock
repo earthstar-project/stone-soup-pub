@@ -548,10 +548,10 @@ sha.js@^2.4.8:
     inherits "^2.0.1"
     safe-buffer "^5.0.1"
 
-sha256-uint8array@^0.10.0:
-  version "0.10.0"
-  resolved "https://registry.yarnpkg.com/sha256-uint8array/-/sha256-uint8array-0.10.0.tgz#a30afd566020039ec4ecc792d0ab997b9bc6c873"
-  integrity sha512-AalrcjuqWl0nIwzu8DAqwbrdxzNsKN2myxOqspDBRz1npmTSXUThldaWx7dSNQ6/lNeWVB/nRIj/6HHkV84www==
+sha256-uint8array@^0.10.1:
+  version "0.10.1"
+  resolved "https://registry.yarnpkg.com/sha256-uint8array/-/sha256-uint8array-0.10.1.tgz#bb3f785d4bceb87dceb975c98f858bc051d06305"
+  integrity sha512-0cBzinlE3dNwss4v0x5zu/ngKSIxS7Uta3ibb0tv4wTtvKFEuFmcuKtWmU4jdHPuMUBg0r1cCGaILMlqLYuWjQ==
 
 sodium-browserify-tweetnacl@^0.2.5:
   version "0.2.6"
@@ -592,10 +592,10 @@ sodium-native@^3.0.0:
   resolved "https://registry.yarnpkg.com/statuses/-/statuses-1.5.0.tgz#161c7dac177659fd9811f43771fa99381478628c"
   integrity sha1-Fhx9rBd2Wf2YEfQ3cfqZOBR4Yow=
 
-stone-soup@^5.0.0:
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/stone-soup/-/stone-soup-5.0.0.tgz#54d4c5738d2b604ce8dacd48fc97c84b11398a1f"
-  integrity sha512-tJCqWVnSIgCpbJwBTsbqLi/2Y5HMvXN5U5+dwf8tIxM08Rja7uMWvTivlNc/OerGbfQhJJveeifGvrHz4iMGqw==
+stone-soup@^5.0.1:
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/stone-soup/-/stone-soup-5.0.1.tgz#f2613977bac62fee9b9190e75e99b7427d83de6c"
+  integrity sha512-jHesRwrO8Jz/4LChy147Z20WeEfwBfGPjoP0tPtmCuuPIdnKB55ebnd5X1AZnGc1xosEPjwlfr8B4Trq7OfeGQ==
   dependencies:
     chalk "^4.1.1"
     chloride "^2.4.1"
@@ -603,7 +603,7 @@ stone-soup@^5.0.0:
     fast-json-stable-stringify "^2.1.0"
     rfc4648 "^1.4.0"
     rfdc "^1.2.0"
-    sha256-uint8array "^0.10.0"
+    sha256-uint8array "^0.10.1"
     superbus "^1.2.0"
     tslib "^2.2.0"
     tweetnacl "^1.0.3"
