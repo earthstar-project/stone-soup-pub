@@ -35,7 +35,7 @@
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "express-sse-middleware": "^3.0.3",
-    "stone-soup": "^5.0.1",
+    "stone-soup": "^6.0.0",
     "tslib": "^2.1.0"
   }
 }

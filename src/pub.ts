@@ -9,8 +9,6 @@ import { sseMiddleware } from 'express-sse-middleware';
 
 import {
     AuthorKeypair,
-    Crypto,
-    CryptoDriverTweetnacl,
     Doc,
     FormatValidatorEs4,
     IStorageAsync,
@@ -18,15 +16,13 @@ import {
     StorageAsync,
     StorageDriverAsyncMemory,
     WorkspaceAddress,
-    isErr,
 } from 'stone-soup';
 
 //================================================================================
 // EARTHSTAR SETUP
 
 let FORMAT = 'es.4';
-let CRYPTO = new Crypto(CryptoDriverTweetnacl);
-let VALIDATOR = new FormatValidatorEs4(CRYPTO);
+let VALIDATOR = new FormatValidatorEs4();
 
 let DEMO_WORKSPACE = '+gardening.pals';
 let setUpDemoStorage = (storage : IStorageAsync) => {
