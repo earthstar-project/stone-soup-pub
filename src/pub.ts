@@ -22,7 +22,7 @@ import {
 // EARTHSTAR SETUP
 
 let FORMAT = 'es.4';
-let VALIDATOR = new FormatValidatorEs4();
+let VALIDATOR = FormatValidatorEs4;
 
 let DEMO_WORKSPACE = '+gardening.pals';
 let setUpDemoStorage = (storage : IStorageAsync) => {

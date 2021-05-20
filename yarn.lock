@@ -597,10 +597,10 @@ sodium-native@^3.0.0:
   resolved "https://registry.yarnpkg.com/statuses/-/statuses-1.5.0.tgz#161c7dac177659fd9811f43771fa99381478628c"
   integrity sha1-Fhx9rBd2Wf2YEfQ3cfqZOBR4Yow=
 
-stone-soup@^6.0.0:
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/stone-soup/-/stone-soup-6.0.0.tgz#6fde10b1ff12da21c256bf4368a2337c844fdc3e"
-  integrity sha512-KwOs5kU1WWg+eGgScFDAdqpvR//ijiQYgmE65YLZ4j8ZYyv6B+YXX6uUaM58/lWlJ8BXBxAyRiKiIHFpfs4Y3A==
+stone-soup@^6.1.0:
+  version "6.1.0"
+  resolved "https://registry.yarnpkg.com/stone-soup/-/stone-soup-6.1.0.tgz#24784e477700b84ceffee21f8e93ccce9f517bed"
+  integrity sha512-H/jdT++o6cakSzpZbARSDBnts3JxoMrCRZSgxYpyYfb6IaJL905x41NfkdybdwDjkaSe52FNAduidUh0Yk0rRA==
   dependencies:
     chalk "^4.1.1"
     chloride "^2.4.1"
