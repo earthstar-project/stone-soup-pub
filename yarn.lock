@@ -41,6 +41,11 @@
     "@types/qs" "*"
     "@types/serve-static" "*"
 
+"@types/heap@^0.2.28":
+  version "0.2.28"
+  resolved "https://registry.yarnpkg.com/@types/heap/-/heap-0.2.28.tgz#c4247fae0e438c76ae05194c4b87cd5c4e859a7d"
+  integrity sha1-xCR/rg5DjHauBRlMS4fNXE6Fmn0=
+
 "@types/mime@^1":
   version "1.3.2"
   resolved "https://registry.yarnpkg.com/@types/mime/-/mime-1.3.2.tgz#93e25bf9ee75fe0fd80b594bc4feb0e862111b5a"
@@ -158,6 +163,15 @@ commander@^5.1.0:
   resolved "https://registry.yarnpkg.com/commander/-/commander-5.1.0.tgz#46abbd1652f8e059bddaef99bbdcb2ad9cf179ae"
   integrity sha512-P0CysNDQ7rtVw4QIQtm+MRxV66vKFSvlsQvGYXZWR3qFU0jlMKHZZZgw8e+8DSah4UDKMqnknRDQz+xuQXQ/Zg==
 
+concurrency-friends@^5.0.0:
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/concurrency-friends/-/concurrency-friends-5.0.1.tgz#399339321c2923da2596548555a0bc6ffdd71f48"
+  integrity sha512-R00265D/UY2iktsbH6pAi7AjtMN+hZPsv55YhcKZajMuAkLY+xyfNbEn3+cl1OOpSxB2r/Q032u29o5AzSLCdQ==
+  dependencies:
+    "@types/heap" "^0.2.28"
+    dbly-linked-list "^0.3.4"
+    heap "^0.2.6"
+
 content-disposition@0.5.3:
   version "0.5.3"
   resolved "https://registry.yarnpkg.com/content-disposition/-/content-disposition-0.5.3.tgz#e130caf7e7279087c5616c2007d0485698984fbd"
@@ -187,6 +201,13 @@ cors@^2.8.5:
   dependencies:
     object-assign "^4"
     vary "^1"
+
+dbly-linked-list@^0.3.4:
+  version "0.3.4"
+  resolved "https://registry.yarnpkg.com/dbly-linked-list/-/dbly-linked-list-0.3.4.tgz#e4f85b79f303808d01a19336c9475abd0aa4f82e"
+  integrity sha512-327vOlwspi9i1T3Kc9yZhRUR8qDdgMQ4HmXsFDDCQ/HTc3sNe7gnF5b0UrsnaOJ0rvmG7yBZpK0NoOux9rKYKw==
+  dependencies:
+    lodash.isequal "^4.5.0"
 
 debug@2.6.9:
   version "2.6.9"
@@ -311,6 +332,11 @@ has-flag@^4.0.0:
   resolved "https://registry.yarnpkg.com/has-flag/-/has-flag-4.0.0.tgz#944771fd9c81c81265c4d6941860da06bb59479b"
   integrity sha512-EykJT/Q1KjTWctppgIAgfSO0tKVuZUjhgMr17kqTumMl6Afv3EISleU7qZUzoXDFTAHTDC4NOoG/ZxU3EvlMPQ==
 
+heap@^0.2.6:
+  version "0.2.6"
+  resolved "https://registry.yarnpkg.com/heap/-/heap-0.2.6.tgz#087e1f10b046932fc8594dd9e6d378afc9d1e5ac"
+  integrity sha1-CH4fELBGky/IWU3Z5tN4r8nR5aw=
+
 http-errors@1.7.2:
   version "1.7.2"
   resolved "https://registry.yarnpkg.com/http-errors/-/http-errors-1.7.2.tgz#4f5029cf13239f31036e5b2e55292bcfbcc85c8f"
@@ -376,6 +402,11 @@ libsodium@^0.7.0:
   version "0.7.9"
   resolved "https://registry.yarnpkg.com/libsodium/-/libsodium-0.7.9.tgz#4bb7bcbf662ddd920d8795c227ae25bbbfa3821b"
   integrity sha512-gfeADtR4D/CM0oRUviKBViMGXZDgnFdMKMzHsvBdqLBHd9ySi6EtYnmuhHVDDYgYpAO8eU8hEY+F8vIUAPh08A==
+
+lodash.isequal@^4.5.0:
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/lodash.isequal/-/lodash.isequal-4.5.0.tgz#415c4478f2bcc30120c22ce10ed3226f7d3e18e0"
+  integrity sha1-QVxEePK8wwEgwizhDtMib30+GOA=
 
 media-typer@0.3.0:
   version "0.3.0"
@@ -598,12 +629,13 @@ sodium-native@^3.0.0:
   integrity sha1-Fhx9rBd2Wf2YEfQ3cfqZOBR4Yow=
 
 stone-soup@^6.1.0:
-  version "6.1.0"
-  resolved "https://registry.yarnpkg.com/stone-soup/-/stone-soup-6.1.0.tgz#24784e477700b84ceffee21f8e93ccce9f517bed"
-  integrity sha512-H/jdT++o6cakSzpZbARSDBnts3JxoMrCRZSgxYpyYfb6IaJL905x41NfkdybdwDjkaSe52FNAduidUh0Yk0rRA==
+  version "6.1.2"
+  resolved "https://registry.yarnpkg.com/stone-soup/-/stone-soup-6.1.2.tgz#80cad7d8ba369ff49e51eaeb49963016934d4a9a"
+  integrity sha512-P4XcdqYLFALSpeSMWVxB0x/RSrXYGo7BjVs3Nr6rGs/0ogUUHpGrRKqELyHd0xEnSrhYwtGI6fpGxpwVCpFDtg==
   dependencies:
     chalk "^4.1.1"
     chloride "^2.4.1"
+    concurrency-friends "^5.0.0"
     fast-deep-equal "^3.1.3"
     fast-json-stable-stringify "^2.1.0"
     rfc4648 "^1.4.0"
